@@ -1,0 +1,10 @@
+**/*.log
+**/*.cache
+**/.DS_Store
+**/._*
+vendor/
+tmp/
+.idea
+var/
+/docker/traefik/**/letsencrypt
+.env.local
