@@ -2,24 +2,57 @@
 
 declare(strict_types=1);
 
+const HTTP_UNAUTHORIZED = 401;
+const HTTP_OK = 200;
+
+header('Content-Type: application/json; charset=utf-8');
+
+function jsonResponse(array $data, int $code = 200): string
+{
+    http_response_code($code);
+
+    return json_encode($data);
+}
+
 $proxyNetwork = $_SERVER['PROXY_NETWORK'];
 $env = $_SERVER['APP_ENV'];
 $requestUri = $_SERVER['REQUEST_URI'];
 
 $isAuthUri = str_starts_with($requestUri, '/auth/check?');
 if (!$isAuthUri) {
-    die('Api auth path not found.');
+    die(
+        jsonResponse(
+            [
+                'error' => 'Api auth path not found.',
+            ],
+            HTTP_UNAUTHORIZED
+        )
+    );
 }
 
 $isApiKey = isset($_GET['apiKey']);
 if (!$isApiKey) {
-    die('Api key not found.');
+    die(
+        jsonResponse(
+            [
+                'error' => 'Api key not found.',
+            ],
+            HTTP_UNAUTHORIZED
+        )
+    );
 }
 
 $apiKey = htmlspecialchars($_GET['apiKey']);
 $apiKey = htmlentities($apiKey);
 if (false === preg_match('/^[a-zA-Z0-9]{64}$/', $apiKey) || strlen($apiKey) !== 64) {
-    die('Api key validation fail.');
+    die(
+        jsonResponse(
+            [
+                'error' => 'Api key validation fail.',
+            ],
+            HTTP_UNAUTHORIZED
+        )
+    );
 }
 
 $pdo = null;
@@ -29,7 +62,14 @@ try {
     $pdo = new \PDO($dsn);
     $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die($e->getMessage());
+    die(
+        jsonResponse(
+            [
+                'error' => $e->getMessage(),
+            ],
+            HTTP_UNAUTHORIZED
+        )
+    );
 }
 
 $query = 'SELECT api_key as apiKey, enddate FROM smfn_api_key WHERE api_key = :APIKEY';
@@ -49,7 +89,16 @@ try {
     }
 
 } catch (\Exception $e) {
-    die($e->getMessage());
+    die(
+        jsonResponse(
+            [
+                'error' => $e->getMessage(),
+            ],
+            HTTP_UNAUTHORIZED
+        )
+    );
 }
+
+http_response_code(HTTP_OK);
 
 echo 'OK';
