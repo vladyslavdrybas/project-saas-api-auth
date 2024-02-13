@@ -63,7 +63,7 @@ networks:
     name: ${PROXY_NETWORK}
     external: true
   database_network:
-    name: ${PROXY_NETWORK}
+    name: ${DATABASE_NETWORK}
     external: true
   default:
     name: ${APP_NETWORK}
