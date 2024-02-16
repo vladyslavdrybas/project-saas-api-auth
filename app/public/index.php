@@ -7,7 +7,7 @@ const HTTP_OK = 200;
 
 header('Content-Type: application/json; charset=utf-8');
 
-function jsonResponse(array $data, int $code = 200): string
+function jsonResponse(array $data, int $code = HTTP_OK): string
 {
     http_response_code($code);
 
@@ -72,7 +72,7 @@ try {
     );
 }
 
-$query = 'SELECT api_key as apiKey, enddate FROM smfn_api_key WHERE api_key = :APIKEY';
+$query = 'SELECT api_key as apiKey, is_subscription_active FROM smfn_api_key WHERE api_key = :APIKEY';
 
 try {
     $statement = $pdo->prepare($query, [PDO::FETCH_ASSOC]);
