@@ -81,10 +81,8 @@ try {
     if (false === $dbApiKey) {
         throw new \Exception('Not found.');
     }
-    $now = new \DateTime();
-    $endDate = new \DateTime($dbApiKey['enddate']);
 
-    if ($endDate < $now) {
+    if (false === $dbApiKey['is_subscription_active']) {
         throw new \Exception('Api key expired.');
     }
 
