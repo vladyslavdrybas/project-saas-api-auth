@@ -32,8 +32,12 @@ services:
     env_file:
       - .env
     networks:
-      - proxy_network
-      - default
+      proxy_network:
+        aliases:
+          - ${APP_NAME}
+      default:
+        aliases:
+          - ${APP_NAME}
     depends_on:
       - php
     labels:

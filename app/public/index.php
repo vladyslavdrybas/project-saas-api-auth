@@ -18,7 +18,8 @@ $proxyNetwork = $_SERVER['PROXY_NETWORK'];
 $env = $_SERVER['APP_ENV'];
 $requestUri = $_SERVER['REQUEST_URI'];
 
-$isAuthUri = str_starts_with($requestUri, '/auth/check?');
+
+$isAuthUri = $requestUri === '/auth/check';
 if (!$isAuthUri) {
     die(
         jsonResponse(
@@ -30,7 +31,7 @@ if (!$isAuthUri) {
     );
 }
 
-$isApiKey = isset($_GET['apiKey']);
+$isApiKey = isset($_SERVER['HTTP_X_AUTH_API_KEY']);
 if (!$isApiKey) {
     die(
         jsonResponse(
@@ -42,7 +43,7 @@ if (!$isApiKey) {
     );
 }
 
-$apiKey = htmlspecialchars($_GET['apiKey']);
+$apiKey = htmlspecialchars($_SERVER['HTTP_X_AUTH_API_KEY']);
 $apiKey = htmlentities($apiKey);
 if (false === preg_match('/^[a-zA-Z0-9]{64}$/', $apiKey) || strlen($apiKey) !== 64) {
     die(
