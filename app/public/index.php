@@ -72,19 +72,34 @@ try {
     );
 }
 
-$query = 'SELECT api_key as apiKey, is_subscription_active FROM smfn_api_key WHERE api_key = :APIKEY';
+$query = 'SELECT l.owner_id as sender, ak.end_date as end_date, ak.cost_per_call as cost_per_call, l.balance as owner_balance FROM smfn_api_key as ak INNER JOIN smfn_ledger as l ON l.owner_id = ak.owner_id WHERE api_key = :APIKEY';
 
 try {
     $statement = $pdo->prepare($query, [PDO::FETCH_ASSOC]);
     $statement->execute(['APIKEY' => $apiKey]);
-    $dbApiKey = $statement->fetch();
+    $dbApiKey = $statement->fetch(PDO::FETCH_ASSOC);
+
     if (false === $dbApiKey) {
         throw new \Exception('Not found.');
     }
 
-    if (false === $dbApiKey['is_subscription_active']) {
-        throw new \Exception('Api key expired.');
+    if ($dbApiKey['owner_balance'] < $dbApiKey['cost_per_call']) {
+        throw new \Exception('Not enough credits.');
     }
+
+    if ($dbApiKey['end_date'] instanceof DateTimeInterface) {
+        $now = new DateTime();
+        if ($dbApiKey['end_date'] < $now) {
+            throw new \Exception('Api key expired.');
+        }
+    }
+
+    $query = 'UPDATE smfn_ledger SET balance = :NEW_BALANCE WHERE owner_id = :SENDER';
+    $statement = $pdo->prepare($query, [PDO::FETCH_ASSOC]);
+    $statement->execute([
+        'NEW_BALANCE' => $dbApiKey['owner_balance'] - $dbApiKey['cost_per_call'],
+        'SENDER' => $dbApiKey['sender']
+    ]);
 
 } catch (\Exception $e) {
     die(
