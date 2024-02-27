@@ -12,7 +12,3 @@ services:
     env_file:
       - .env
       - .env.local
-    labels:
-      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-http.rule=Host(`saas.localhost`) && PathPrefix(`/${SERVICE_NAME}/api/v${API_VERSION}`, `/${SERVICE_NAME}/_profiler`)"
-      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.rule=Host(`saas.localhost`) && PathPrefix(`/${SERVICE_NAME}/api/v${API_VERSION}`, `/${SERVICE_NAME}/_profiler`)"
-      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.tls.domains[0].main=saas.localhost"

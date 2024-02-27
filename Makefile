@@ -2,6 +2,7 @@
 include .env
 
 echo-env:
+	echo ${HOST}
 	echo ${APP_NAME}
 	echo ${PROXY_NETWORK}
 	echo ${APP_NETWORK}
