@@ -29,9 +29,14 @@ if [ -f "${envFile}" ]; then
 fi
 
 getVarsFromFile .env.local
-rm .env
+
+if [ -f ".env" ]; then
+	rm .env
+fi
 
 for key in "${!envVars[@]}";
 do
 	echo "${key}=${envVars[${key}]}" >> .env
 done
+
+chmod 755 .env
