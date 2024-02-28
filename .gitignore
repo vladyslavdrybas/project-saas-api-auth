@@ -8,3 +8,4 @@ tmp/
 var/
 /docker/traefik/**/letsencrypt
 .env.local
+.env

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   php:
-    container_name: ${PROJECT_NAME:-solo}-${SERVICE_NAME:-service}-api-${API_VERSION:-1.0}-php
+    container_name: ${PROJECT_NAME:-solo}-${SERVICE_NAME:-service}-api-${API_VERSION:-1.0}-php-${APP_ENV:-none}
     image: vd_php_base:1.0
     build:
         args:
@@ -21,11 +21,12 @@ services:
       - ./app:/app:rw
 
   web:
-    container_name: ${PROJECT_NAME:-solo}-${SERVICE_NAME:-service}-api-${API_VERSION:-1.0}-web
+    container_name: ${PROJECT_NAME:-solo}-${SERVICE_NAME:-service}-api-${API_VERSION:-1.0}-web-${APP_ENV:-none}
     image: vd_nginx_base:1.0
     build:
       args:
         APP_ENV: ${APP_ENV}
+        HOST: ${HOST}
     env_file:
       - .env
       - .env.local
@@ -40,12 +41,12 @@ services:
       - php
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-http.rule=Host(`${HOST}`) && PathPrefix(`/${SERVICE_NAME}/api/v${API_VERSION}`, `/${SERVICE_NAME}/_profiler`)"
-      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.rule=Host(`${HOST}`) && PathPrefix(`/${SERVICE_NAME}/api/v${API_VERSION}`, `/${SERVICE_NAME}/_profiler`)"
-      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.tls.domains[0].main=${HOST}"
       - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-http.entrypoints=web"
       - "traefik.http.middlewares.${PROJECT_NAME}-${SERVICE_NAME}-https.redirectscheme.scheme=https"
       - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.entrypoints=websecure"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-http.rule=Host(`${HOST}`) && PathPrefix(`/${SERVICE_NAME}/api/v${API_VERSION}`, `/${SERVICE_NAME}/_profiler`)"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.rule=Host(`${HOST}`) && PathPrefix(`/${SERVICE_NAME}/api/v${API_VERSION}`, `/${SERVICE_NAME}/_profiler`)"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.tls.domains[0].main=${HOST}"
       - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.tls=true"
       - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-http.middlewares=${PROJECT_NAME}-${SERVICE_NAME}-https"
       - "traefik.http.middlewares.${PROJECT_NAME}-${SERVICE_NAME}-apiprefix.stripprefixregex.regex=/${SERVICE_NAME}/(?:api|proxy|dashboard|panel)/v[0-9]+(?:\\.[0-9]+)?/"
