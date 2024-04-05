@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   php:
     container_name: ${PROJECT_NAME:-solo}-${SERVICE_NAME:-service}-api-${API_VERSION:-1.0}-php-${APP_ENV:-none}
@@ -13,8 +11,6 @@ services:
     networks:
       - database_network
       - default
-    depends_on:
-      - database
     labels:
       - "traefik.enable=false"
     volumes:
